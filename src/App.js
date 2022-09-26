@@ -13,22 +13,27 @@ function App() {
     const [lat, lon] = searchData.value.split(" ");
     const currentWeatherFetch = fetch(`${WEATHER_API_URL}/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}`);
     const forecastFetch = fetch(`${WEATHER_API_URL}/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}`);
-
+    
     Promise.all([currentWeatherFetch, forecastFetch])
     .then(async(response) =>{
-      const weatherResponse = await response[0].json();
+      const weatherResponse = await response[0].json();//in order to map the response
       const forecastResponse = await response[1].json();
-      setCurrentWeather(weatherResponse);
-      setForecast(forecastResponse);
+      setCurrentWeather({city: searchData.label, ...weatherResponse});//react es6
+      setForecast({city: searchData.label, ...forecastResponse});
     })
-  
+    .catch((err) => console.log(err));
+    
   }
+  console.log(currentWeather);
+
+  console.log(forecast);
+
   return (
     <div className="container">
     <Search onSearchChange={handleOnSearchChange}/>
-    <CurrentWeather />
+    {currentWeather && <CurrentWeather data={currentWeather} />}
     </div>
   );
 }
-
+//if current weather exist, show the widget. If doesn't, don't show anything
 export default App;
